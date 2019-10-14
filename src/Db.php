@@ -16,11 +16,10 @@ class Db {
         throw new Exception("Cannot unserialize a singleton.");
     }
     public static function getConnect() {
-        if (self::$connect) {
-            return self::$connect;
-        } else {
+        if (!self::$connect) {
             self::$connect = new mysqli(self::$host, self::$user, self::$pass, self::$db);
-            return self::$connect;
         }
+
+        return self::$connect;
     }
 }

@@ -1,12 +1,11 @@
 <?php
 
-require 'vendor/autoload.php';
-require 'config.php';
+require 'bootstrap.php';
 
 $linkParser = new LinkParser();
 $collector = new Collector($linkParser);
 
-while(true) {
+while (true) {
     $newWord = generateNewWord();
     $searchQueries = generateSearchQueries();
 

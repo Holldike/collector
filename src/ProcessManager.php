@@ -5,7 +5,7 @@ class ProcessManager {
         $pid = pcntl_fork();
 
         if ($pid == -1) {
-            die('fork Error');
+            die('Fork error');
         }
 
         if (!$pid) {

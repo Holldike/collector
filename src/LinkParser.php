@@ -7,14 +7,14 @@ class LinkParser {
         $this->domainSymbols = $this->generateDomainSymbols();
     }
 
-    private function generateDomainSymbols() {
+    private function generateDomainSymbols():array {
         $domainSymbols = array_merge(range('a', 'z'), range(1, 9));
         $domainSymbols[] = '.';
         $domainSymbols[] = '-';
         return $domainSymbols;
     }
 
-    public function fetchAllDomains(array $links) {
+    public function fetchAllDomainsFromArray(array $links): array {
         $result = [];
 
         foreach ($links as $link) {
@@ -26,7 +26,7 @@ class LinkParser {
         return $result;
     }
 
-    public function fetchDomain(string $link) {
+    public function fetchDomain(string $link): string {
         $explodedLink = explode('://', $link);
 
         if (isset($explodedLink[1]) && $explodedLink[1]) {

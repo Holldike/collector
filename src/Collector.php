@@ -30,7 +30,7 @@ class Collector {
     public function process() {
         $links = $this->fetchAllUrl();
 
-        $domains = $this->linkParser->fetchAllDomains($links);
+        $domains = $this->linkParser->fetchAllDomainsFromArray($links);
 
         echo 'In processing now ' . count($this->ips) . "\n";
 
@@ -44,11 +44,12 @@ class Collector {
         $ips = [];
 
         foreach ($domains as $domain) {
+            $ip = $this->getDomainIp($domain);
             if (preg_match(
                 '/^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/',
-                $this->getDomainIp($domain))
+                $ip)
             ) {
-                $ips[] = $this->getDomainIp($domain);
+                $ips[] = $ip;
             }
         }
 
@@ -83,6 +84,7 @@ class Collector {
                 unset($ips[$key]);
             }
         }
+
         return $ips;
     }
 }
