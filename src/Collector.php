@@ -5,9 +5,8 @@ class Collector {
     private $page = '';
     private $ips = [];
 
-    public function __construct(LinkParser $linkParser, Db $db) {
+    public function __construct(LinkParser $linkParser) {
         $this->dom = new DOMDocument();
-        $this->db = $db;
         $this->linkParser = $linkParser;
     }
 
@@ -37,8 +36,7 @@ class Collector {
 
         if (count($this->ips) >= 100) {
             ProcessManager::fork(function () {
-                $this->db->connect();
-                $this->db->addIps($this->ips);
+                $this->addIps($this->ips);
             });
             $this->ips = [];
         }
@@ -46,7 +44,12 @@ class Collector {
         $ips = [];
 
         foreach ($domains as $domain) {
-            $ips[] = $this->getDomainIp($domain);
+            if (preg_match(
+                '/^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/',
+                $this->getDomainIp($domain))
+            ) {
+                $ips[] = $this->getDomainIp($domain);
+            }
         }
 
         foreach ($ips as $key => $ip) {
@@ -58,5 +61,28 @@ class Collector {
 
     private function getDomainIp(string $domain) {
         return gethostbyname($domain);
+    }
+
+    public function addIps(array $ips) {
+        $uniqueIps = $this->uniqueFilter($ips);
+
+        foreach ($uniqueIps as $ip) {
+            echo 'added ' . $ip . "\n";
+            Db::getConnect()->query("INSERT INTO ips (ip) VALUE('$ip');");
+        }
+
+        echo 'NEW DUMP!!! SUM: ' . count($uniqueIps) . "\n";
+        die;
+    }
+
+    private function uniqueFilter(array $ips) {
+        foreach ($ips as $key => $ip) {
+            $query = Db::getConnect()->query("SELECT COUNT(*) AS count FROM ips WHERE ip = '$ip';");
+
+            if ($query->fetch_assoc()['count']) {
+                unset($ips[$key]);
+            }
+        }
+        return $ips;
     }
 }

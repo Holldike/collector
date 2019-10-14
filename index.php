@@ -3,13 +3,12 @@
 require 'vendor/autoload.php';
 require 'config.php';
 
-$db = new Db(DB_USER, DB_PASS, DB_HOST, DB);
 $linkParser = new LinkParser();
-$collector = new Collector($linkParser, $db);
+$collector = new Collector($linkParser);
 
 while(true) {
     $newWord = generateNewWord();
-    $searchQueries = generateSearchQueries($newWord);
+    $searchQueries = generateSearchQueries();
 
     foreach ($searchQueries as $query) {
         if ($page = file_get_contents($query)) {
