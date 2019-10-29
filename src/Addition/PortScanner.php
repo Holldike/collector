@@ -6,20 +6,16 @@ use \SimpleXMLElement;
 
 class PortScanner {
     private $allIpRows;
-    private $ipsSum;
-    private $endpoint;
+    private $ipsInProgress = [];
 
     public function __construct() {
-        Db::getConnect()->query("SET @n = 0");
-        $res = Db::getConnect()->query("SELECT (@n := @n + 1) AS POSITION, ip, id FROM ips");
+        $res = Db::getConnect()->query(
+            "SELECT ip, id, ports.id_ip FROM ips 
+                    LEFT JOIN ports ON ips.id = ports.id_ip 
+                    WHERE ports.id_ip IS NULL"
+        );
 
-        $this->endpoint = (int)file_get_contents('.endpoint');
         $this->allIpRows = $res->fetch_all(MYSQLI_ASSOC);
-        $this->ipsSum = $res->num_rows;
-    }
-
-    private function refreshEndpointFile(int $position) {
-        file_put_contents('.endpoint', $position);
     }
 
     private function fetchPortsDataFromScanData(SimpleXMLElement $scanData): array {
@@ -51,22 +47,35 @@ class PortScanner {
     }
 
     public function process() {
-        foreach ($this->allIpRows as $ipRow) {
-            $ip = $ipRow['ip'];
-            $id = $ipRow['id'];
-            $position = $ipRow['POSITION'];
+//        for ($i = AMOUNT_PROCESS; $i > 0; $i--) {
+//            \ProcessManager::fork(function () {
+                foreach ($this->allIpRows as $key => $ipRow) {
+                    $ip = $ipRow['ip'];
+                    $id = $ipRow['id'];
 
-            if ($position > $this->endpoint) {
-                $this->refreshEndpointFile((int)$position);
+                    if ($this->uniqueFilter((int)$id)) {
+                        $this->ipsInProgress[] = $id;
 
-                exec('nmap ' . $ip . ' -oX nmap_output.xml');
+                        exec('nmap -F ' . $ip . ' -oX nmap_output.xml');
 
-                $scanData = simplexml_load_file('nmap_output.xml');
-                $portData = $this->fetchPortsDataFromScanData($scanData);
+                        $scanData = simplexml_load_file('nmap_output.xml');
+                        $portData = $this->fetchPortsDataFromScanData($scanData);
 
-                $this->addPorts($id, $portData);
-                echo 'yet: ' . ($this->ipsSum - $position) . "\n";
-            }
-        }
+                        $this->addPorts($id, $portData);
+                        //Delete from progress list and from main list ips
+                        unset($this->allIpRows[$key]);
+                        unset($this->ipsInProgress[$id]);
+
+                        echo 'yet: ' . count($this->allIpRows) . " pid: " . getmypid() . "\n";
+                    }
+                }
+          //  });
+//        }
+    }
+
+    private function uniqueFilter(int $id) {
+        $isIpInProgressScanned = in_array($id, $this->ipsInProgress);
+        //If ip don't handling now and return TRUE
+        return (!$isIpInProgressScanned) ? true : false;
     }
 }

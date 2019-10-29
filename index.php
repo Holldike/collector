@@ -43,6 +43,6 @@ function generateSearchQueries() {
             'https://search.naver.com/search.naver?sm=top_hty&fbm=1&ie=utf8&query=' . generateNewWord(),
             'https://www.sogou.com/web?query=' . generateNewWord() . '&_asf=www.sogou.com&_ast=1570648272&w=01019900&p=40040100&ie=utf8&from=index-nologin&s_from=index&sut=1352&sst0=1570648271964&lkt=9%2C1570648270612%2C1570648271298&sugsuv=1570648269524531&sugtime=1570648271964',
             'https://www.qwant.com/?q=' . generateNewWord() . '&t=web',
-            'https://uk.ask.com/web?q=' . generateNewWord() . '&qsrc=0&o=0&l=dir&qo=homepageSearchBox'
+            #'https://uk.ask.com/web?q=' . generateNewWord() . '&qsrc=0&o=0&l=dir&qo=homepageSearchBox'
         ];
 }
