@@ -1,5 +1,9 @@
 {
   "autoload": {
     "psr-4": {"": "src/"}
+  },
+  "require": {
+    "ext-simplexml": "*",
+    "ext-pcntl": "*"
   }
 }
