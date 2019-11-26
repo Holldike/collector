@@ -73,7 +73,6 @@ class Collector {
         }
 
         echo 'NEW DUMP!!! SUM: ' . count($uniqueIps) . "\n";
-        die;
     }
 
     private function uniqueFilter(array $ips) {

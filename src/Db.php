@@ -13,7 +13,7 @@ class Db {
 
     public function __wakeup()
     {
-        throw new Exception("Cannot unserialize a singleton.");
+        throw new Error("Cannot unserialize a singleton.");
     }
     public static function getConnect() {
         if (!self::$connect) {

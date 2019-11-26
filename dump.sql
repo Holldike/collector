@@ -8,5 +8,7 @@ CREATE TABLE `ports` (
   `id_ip` int(11) NOT NULL,
   `port` int(5) NOT NULL,
   `service` varchar(32) DEFAULT NULL,
-  `state` varchar(32) DEFAULT NULL
-);
+  `state` varchar(32) DEFAULT NULL,
+  KEY `id_ipx` (`id_ip`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 |
+

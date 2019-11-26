@@ -4,6 +4,8 @@
   },
   "require": {
     "ext-simplexml": "*",
-    "ext-pcntl": "*"
+    "ext-pcntl": "*",
+    "ext-posix": "*",
+    "ext-mysqli": "*"
   }
 }
